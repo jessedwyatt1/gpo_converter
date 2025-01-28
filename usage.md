@@ -13,11 +13,35 @@ A command-line utility for converting Windows Group Policy Objects (GPOs) to Tan
 
 ## Basic Usage
 
-The basic syntax for the converter is:
+The converter can be used either through the command line interface (CLI) or graphical user interface (GUI).
+
+### Command Line Interface
+
+The basic syntax for the CLI is:
 
 ```bash
 python gpo_converter.py INPUT OUTPUT [OPTIONS]
 ```
+
+### Graphical User Interface
+
+To launch the GUI, either:
+
+```bash
+python gpo_converter.py --gui
+```
+
+or simply:
+
+```bash
+python gpo_converter.py
+```
+
+The GUI provides an intuitive interface with:
+- File/directory selection dialogs
+- Option toggles for all settings
+- Real-time log output
+- Progress feedback
 
 ### Required Arguments
 
@@ -26,10 +50,15 @@ python gpo_converter.py INPUT OUTPUT [OPTIONS]
 
 ### Optional Arguments
 
-- `--log-level`: Set logging verbosity
+- `-g`, `--gui`: Launch the graphical user interface
+- `-l`, `--log-level`: Set logging verbosity
   - Choices: DEBUG, INFO, WARNING, ERROR, CRITICAL
   - Default: INFO
-- `--pretty`: Format output JSON for readability
+- `-p`, `--pretty`: Format output JSON for readability
+- `-f`, `--fail-on-warnings`: Exit with a non-zero status if warnings were encountered
+- `-a`, `--skip-audit`: Skip parsing of audit policy settings
+
+Note: When using GUI mode, the input and output path arguments become optional.
 
 ## Examples
 
@@ -45,16 +74,31 @@ python gpo_converter.py ./security-baseline.xml ./output.json
 python gpo_converter.py ./gpo_exports/ ./all_policies.json
 ```
 
-### Enable Debug Logging
+### CLI Examples
 
+Enable Debug Logging:
 ```bash
-python gpo_converter.py input.xml output.json --log-level DEBUG
+python gpo_converter.py input.xml output.json -l DEBUG
 ```
 
-### Pretty Print Output
-
+Pretty Print Output:
 ```bash
-python gpo_converter.py input.xml output.json --pretty
+python gpo_converter.py input.xml output.json -p
+```
+
+Skip Audit Policy Processing:
+```bash
+python gpo_converter.py input.xml output.json -a
+```
+
+Fail on Warnings:
+```bash
+python gpo_converter.py input.xml output.json -f
+```
+
+Launch GUI Mode:
+```bash
+python gpo_converter.py -g
 ```
 
 ## Supported GPO Settings
@@ -128,7 +172,12 @@ Errors: 0
 ## Exit Codes
 
 - `0`: Successful conversion
+  - All processing completed successfully
+  - No errors encountered (warnings may exist if --fail-on-warnings not used)
 - `1`: Error occurred during conversion
+  - Processing failed
+  - Critical errors encountered
+  - Warnings encountered when --fail-on-warnings is enabled
 
 ## Best Practices
 
@@ -136,6 +185,10 @@ Errors: 0
 2. Use the `--log-level DEBUG` option when troubleshooting
 3. Back up your original GPO files before conversion
 4. Process GPOs in small batches when converting many files
+5. Use `--fail-on-warnings` in automated pipelines to catch potential issues
+6. Consider using `--skip-audit` if audit policies are not needed for your use case
+7. When processing multiple files, use the GUI mode for better progress tracking and feedback
+8. For automated processing, use CLI mode with appropriate flags
 
 ## Common Issues and Solutions
 
@@ -152,4 +205,4 @@ If settings are missing from the output:
 1. Check the input GPO XML contains the expected settings
 2. Verify the settings are in a supported format
 3. Enable DEBUG logging to see which settings were processed
-
+4. Verify that `--skip-audit` is not enabled if you need audit policies
